@@ -1,0 +1,85 @@
+---
+title: "MAS23620"
+author: "Student Name"
+date: "10/27/2019"
+output: word_document
+---
+
+
+#===========Loading the dataset==============
+```{r}
+library(readxl)
+MAS23620 <- read_excel("MAS23620.xlsx")
+View(MAS23620)
+```
+
+#===========================Exercise 01=======================
+```{r}
+x <- lm(MEDV ~ CRIM + RM + NOX + DIS + AGE, data = MAS23620)
+summary(x)
+summary(x)$coefficient
+```
+
+#==========================Exercise 02==========================
+```{r}
+MAS23620
+NOXCAT$category <-
+  c(cut(
+    MAS23620$NOX,
+    breaks = c(-Inf, 0.5, 0.6, Inf),
+    labels = c("low", "middle", "high")
+  ))
+NOXCAT$category
+MAS23620$NOXCAT <- NOXCAT$category
+MAS23620
+boxplot(MEDV ~ NOXCAT, data = MAS23620, col = 'white')
+```
+
+#==========================Exercise 03====================
+```{r}
+x <- lm(MEDV ~ NOXCAT, data = MAS23620)
+summary(x)
+summary(x)$coefficient
+```
+
+
+#===========================Exercise 04========================
+```{r}
+library(ggplot2)
+ggplot(data = MAS23620, mapping = aes(y = MEDV, x = LSTAT)) + geom_point()
+
+```
+
+#==========================Exercise 05=======================
+```{r}
+library(boot)
+model_GLR = glm(MEDV ~ LSTAT, data = MAS23620)
+coef(model_GLR)
+```
+
+#==========================Exercise 06=======================
+
+#11-fold cross validation is more advantageous than 10-fold because of model stability. 10-fold CV is prone to generalized relationships.
+```{r}
+library(boot)
+set.seed(1)
+cv.err <- rep(NA, 8)
+for (i in 1:8) {
+  fit <- glm(MEDV ~ poly(LSTAT, i), data = MAS23620)
+  cv.err[i] <- cv.glm(MAS23620, fit, K = 8)$delta[1]
+}
+plot(1:8, cv.err, xlab = "Degree of Polynomial", ylab = "Mean Squared Error")
+d.min <- which.min(cv.err)
+points(d.min,
+       cv.err[d.min],
+       col = "blue",
+       cex = 2,
+       pch = 20)
+
+```
+
+
+
+
+
+
